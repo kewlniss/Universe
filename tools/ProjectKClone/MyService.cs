@@ -105,7 +105,12 @@ namespace NuGetClone
 
         private void PurgeOldVersions(LocalPackageRepository targetRepo, IPackage package)
         {
-            foreach (var oldPackage in targetRepo.FindPackagesById(package.Id).Where(p => p.Version < package.Version))
+            var packagesToDelete = targetRepo.FindPackagesById(package.Id)
+                                             .Where(p => p.Version < package.Version)
+                                             .OrderByDescending(p => p.Version)
+                                             .Skip(3);
+                        
+            foreach (var oldPackage in packagesToDelete)
             {
                 try
                 {
